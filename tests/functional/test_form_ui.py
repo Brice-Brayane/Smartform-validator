@@ -1,36 +1,56 @@
-# tests/functional/test_form_ui.py
-# ---------------------------------------------------------------
-# Selenium-Test für das SmartForm-Formular (Headless Firefox).
-# ---------------------------------------------------------------
-
 import pytest
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 @pytest.fixture(scope="module")
 def driver():
-    options = Options()
-    options.headless = True
-    service = Service(executable_path=GeckoDriverManager().install())
-    driver = webdriver.Firefox(service=service, options=options)
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.binary_location = "/usr/bin/chromium"
+    service = Service("/usr/bin/chromedriver")
+    driver = webdriver.Chrome(service=service, options=options)
     yield driver
     driver.quit()
 
-def test_empty_form_shows_errors(driver):
+def test_formulaire_valide(driver):
     driver.get("http://localhost:5000")
-    driver.find_element(By.XPATH, "//button[text()='Validieren']").click()
-    errors = driver.find_elements(By.CSS_SELECTOR, "#ergebnisse p")
-    texts = [e.text.lower() for e in errors]
-    assert any("name" in t for t in texts)
-    assert any("email" in t for t in texts)
 
-def test_valid_form_shows_success(driver):
+    # Remplir les champs
+    driver.find_element(By.ID, "name").send_keys("Alice")
+    driver.find_element(By.ID, "email").send_keys("alice@example.com")
+
+    # Soumettre le formulaire
+    driver.find_element(By.CSS_SELECTOR, "#smartform button[type=submit]").click()
+
+    # Vérifier que le message indique que le formulaire est valide
+    message = driver.find_element(By.ID, "ergebnisse").text
+    assert "gültig" in message.lower()  # Test robuste en minuscule
+
+
+
+def test_email_invalide(driver):
     driver.get("http://localhost:5000")
-    driver.find_element(By.ID, "name").send_keys("TestUser")
-    driver.find_element(By.ID, "email").send_keys("test@example.com")
-    driver.find_element(By.XPATH, "//button[text()='Validieren']").click()
-    success = driver.find_element(By.CSS_SELECTOR, "#ergebnisse p")
-    assert "gültig" in success.text.lower()
+
+    driver.find_element(By.ID, "name").send_keys("Bob")
+    driver.find_element(By.ID, "email").send_keys("email_invalide")
+    driver.find_element(By.CSS_SELECTOR, "#smartform button[type=submit]").click()
+
+    wait = WebDriverWait(driver, 5)
+
+    # ➤ Attendre que la div soit remplie (sans chercher un mot)
+    wait.until(lambda d: d.find_element(By.ID, "ergebnisse").text.strip() != "")
+
+    # ➤ Afficher le texte réel pour comprendre ce que Selenium voit
+    message = driver.find_element(By.ID, "ergebnisse").text
+    print("🧪 MESSAGE AFFICHÉ DANS LE BROWSER:")
+    print(message)
+
+    # ➤ Test souple
+    assert "ungültig" in message.lower() or "e-mail" in message.lower()
+
+

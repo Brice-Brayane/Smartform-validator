@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Brice-Brayane/Smartform-validator.git' // ⬅️ remplace par ton vrai repo
+                git 'https://github.com/Brice-Brayane/Smartform-validator.git' 
             }
         }
 

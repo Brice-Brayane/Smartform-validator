@@ -1,16 +1,15 @@
 # backend/forms.py
-# ---------------------------------------------------------------
-# Repräsentiert die Formulardaten und bietet Zugriff über .get()
-# ---------------------------------------------------------------
 
 class FormData:
-    """
-    Repräsentation der Formulardaten.
-    Ermöglicht einen sauberen Zugriff auf Felder via .get().
-    """
-
     def __init__(self, data):
         self.data = data
 
-    def get(self, field_name):
-        return self.data.get(field_name, None)
+    def get(self, field_name, default=None):
+        value = self.data.get(field_name, default)
+        return value.strip() if isinstance(value, str) else value
+
+    def get_int(self, field_name, default=0):
+        try:
+            return int(self.get(field_name))
+        except (ValueError, TypeError):
+            return default

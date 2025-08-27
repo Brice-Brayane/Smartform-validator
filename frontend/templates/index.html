@@ -2,23 +2,74 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmartForm Validator</title>
+
+    <!-- Zentrales Stylesheet (kein Inline-CSS im HTML) -->
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>SmartForm Validator</h1>
+    <!-- Hauptüberschrift der Anwendung -->
+    <header>
+        <h1>SmartForm Validator</h1>
+    </header>
 
-    <form id="smartform">
-        <label for="name">Name:</label>
-        <input type="text" id="name"><br><br>
+    <main>
+        <!--
+          Formular zur Erfassung der Nutzerdaten.
+          Hinweise:
+          - "required" erzwingt Basiskonformität im Browser.
+          - "autocomplete" verbessert UX.
+          - "name" ist sinnvoll für semantische Formdaten (auch wenn hier JSON via Fetch gesendet wird).
+        -->
+        <form id="smartform" novalidate>
+            <fieldset>
+                <legend>Bitte geben Sie Ihre Daten ein</legend>
 
-        <label for="email">E-Mail:</label>
-        <input type="email" id="email"><br><br>
+                <div class="form-row">
+                    <label for="name">Name</label>
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        inputmode="text"
+                        autocomplete="name"
+                        required
+                        aria-required="true"
+                        placeholder="Max Mustermann">
+                </div>
 
-        <button type="submit">Validieren</button>
-    </form>
+                <div class="form-row">
+                    <label for="email">E-Mail</label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        inputmode="email"
+                        autocomplete="email"
+                        required
+                        aria-required="true"
+                        placeholder="max.mustermann@example.org">
+                </div>
 
-    <div id="ergebnisse"></div>
+                <div class="form-actions">
+                    <button type="submit">Validieren</button>
+                </div>
+            </fieldset>
+        </form>
 
-    <script src="/static/script.js"></script>
+        <!--
+          Ergebnisbereich für Validierungsmeldungen aus dem Backend.
+          aria-live="polite" sorgt dafür, dass Screenreader Änderungen vorlesen.
+        -->
+        <section id="ergebnisse" class="messages" role="status" aria-live="polite"></section>
+
+        <noscript>
+            JavaScript ist deaktiviert. Bitte aktivieren Sie JavaScript, um das Formular zu validieren.
+        </noscript>
+    </main>
+
+    <!-- Anwendungslogik (Fetch → /validate) -->
+    <script src="/static/script.js" defer></script>
 </body>
 </html>

@@ -17,31 +17,6 @@ Die Anwendung zeigt, wie eine kleine Web-App (Flask + JavaScript) durch systemat
 
 ---
 
-## Projektstruktur
-
-├── backend/ # Flask-Backend (App, Validierung, Business-Logik)
-│ ├── app.py
-│ ├── forms.py
-│ ├── validators.py
-│ └── requirements.txt
-├── frontend/ # Statisches Frontend (HTML + JS)
-│ ├── static/
-│ │ └── script.js
-│ └── templates/
-│ └── index.html
-├── tests/ # Test-Suite (Unit + Functional)
-│ ├── unit/
-│ │ └── test_validators.py
-│ └── functional/
-│ └── test_form_ui.py
-├── docker-compose.yml # Services (App + PostgreSQL)
-├── Dockerfile # Backend-Image (Python + Flask)
-├── Jenkinsfile # CI/CD-Pipeline
-└── README.md # Projektdokumentation
-
-
-
----
 
 ## Installation & Start
 

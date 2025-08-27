@@ -38,3 +38,89 @@ Die Anwendung zeigt, wie eine kleine Web-App (Flask + JavaScript) durch systemat
 ├── Dockerfile # Backend-Image (Python + Flask)
 ├── Jenkinsfile # CI/CD-Pipeline
 └── README.md # Projektdokumentation
+
+
+
+---
+
+## Installation & Start
+
+### Voraussetzungen
+- Docker & Docker Compose
+- Python 3.11 (optional, für lokalen Lauf ohne Docker)
+- Firefox/GeckoDriver (für Selenium-Tests lokal)
+
+### Start mit Docker Compose
+```bash
+git clone https://github.com/Brice-Brayane/Smartform-validator.git
+cd Smartform-validator
+docker compose up --build
+
+
+
+Die Anwendung ist erreichbar unter:
+http://localhost:5000
+
+
+
+
+## Tests
+Unit-Tests
+docker compose exec app pytest tests/unit -v
+
+Funktionale Tests (UI mit Selenium)
+docker compose exec app pytest tests/functional -v
+
+Alle Tests mit Coverage & JUnit-Report
+docker compose exec app pytest tests --cov=backend --junitxml=test-results/junit.xml
+
+
+
+## CI/CD Pipeline (Jenkins)
+
+Die Pipeline (Jenkinsfile) umfasst:
+
+Checkout aus dem Git-Repository
+
+Build des Docker-Images
+
+Start von App + Datenbank (inkl. Healthcheck)
+
+Testausführung (Unit + Functional)
+
+Archivierung von Testergebnissen (JUnit, Coverage)
+
+Automatisches Aufräumen der Services
+
+
+## Tech-Stack
+
+Backend: Python 3.11, Flask
+
+Frontend: HTML, Vanilla JavaScript
+
+Datenbank: PostgreSQL 15
+
+Testautomatisierung: PyTest, Selenium, WebDriverManager
+
+CI/CD: Jenkins, Docker, GitHub Actions (optional integrierbar)
+
+
+## Qualitätsaspekte
+
+Kommentierter, klar strukturierter Code (deutschsprachige Docstrings und Kommentare, unternehmensüblich)
+
+Trennung von Unit- und Functional-Tests → schnellere Feedbackzyklen
+
+Reproduzierbare Containerumgebung für Dev & CI
+
+Non-Root-User im Docker-Image
+
+
+## Erweiterbar für:
+
+zusätzliche Validierungsregeln
+
+Integration in Jira-Testmanagement
+
+Reporting mit Allure oder pytest-html

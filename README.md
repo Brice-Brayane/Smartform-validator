@@ -64,7 +64,7 @@ http://localhost:5000
 
 
 
-## Tests
+Tests
 Unit-Tests
 docker compose exec app pytest tests/unit -v
 
@@ -76,7 +76,7 @@ docker compose exec app pytest tests --cov=backend --junitxml=test-results/junit
 
 
 
-## CI/CD Pipeline (Jenkins)
+CI/CD Pipeline (Jenkins)
 
 Die Pipeline (Jenkinsfile) umfasst:
 
@@ -93,7 +93,7 @@ Archivierung von Testergebnissen (JUnit, Coverage)
 Automatisches Aufräumen der Services
 
 
-## Tech-Stack
+Tech-Stack
 
 Backend: Python 3.11, Flask
 
@@ -106,7 +106,7 @@ Testautomatisierung: PyTest, Selenium, WebDriverManager
 CI/CD: Jenkins, Docker, GitHub Actions (optional integrierbar)
 
 
-## Qualitätsaspekte
+Qualitätsaspekte
 
 Kommentierter, klar strukturierter Code (deutschsprachige Docstrings und Kommentare, unternehmensüblich)
 
@@ -117,7 +117,7 @@ Reproduzierbare Containerumgebung für Dev & CI
 Non-Root-User im Docker-Image
 
 
-## Erweiterbar für:
+Erweiterbar für:
 
 zusätzliche Validierungsregeln
 

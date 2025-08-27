@@ -1,20 +1,65 @@
+# docker-compose.yml
+# --------------------------------------------------------------------
+# SmartForm: Entwicklungs-Stack (App + PostgreSQL)
+# Ziele:
+#  - Reproduzierbare Dev-Umgebung
+#  - Persistente Datenhaltung (db_data)
+#  - Healthchecks für bessere Startreihenfolge/Diagnostik
+#  - Konfiguration über .env (keine Secrets im Klartext)
+# --------------------------------------------------------------------
+
 services:
   app:
     build: .
+    container_name: smartform_app
+    # Port-Mapping nur für Entwicklung; in Prod typ. hinter Reverse Proxy
     ports:
-      - "5000:5000"
+      - "${APP_PORT:-5000}:5000"
+    environment:
+      # Beispiel: Flask/Backend liest diese Variablen
+      FLASK_ENV: "${FLASK_ENV:-development}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
+      # Code-Live-Mount für schnelle Dev-Iterationen (nicht in Produktion!)
       - .:/app
+    healthcheck:
+      # App-Readiness: HTTP 200 der Root-Route
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5000/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
   db:
     image: postgres:15
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: smartform
+    container_name: smartform_db
+    # Externen Port für DB nur bei Bedarf exposen; sonst weglassen
     ports:
-      - "5432:5432"
+      - "${DB_PORT_EXPOSE:-5432}:5432"
+    environment:
+      POSTGRES_USER:     "${POSTGRES_USER:-user}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
+      POSTGRES_DB:       "${POSTGRES_DB:-smartform}"
+      # Optional: Encoding/Locale konsistent setzen
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      # Persistente Datenbankdaten
+      - db_data:/var/lib/postgresql/data
+      # Optional: SQL-Skripte zum Initialisieren (z. B. schema.sql)
+      # - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Prüft, ob die DB Verbindungen akzeptiert
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-smartform} -h localhost -p 5432"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
 
 volumes:
   db_data:
+    # Named Volume für postgres-Daten
